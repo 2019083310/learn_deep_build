@@ -15,7 +15,12 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 // ?压缩css文件
-const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+// *这个插件不再维护了，用下面的插件替代
+// const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+
+// ?引入terser-webpack-plugin
+const TerserPlugin = require('terser-webpack-plugin')
 
 // *引入ProvidePlugin做shimming
 const {
@@ -29,21 +34,22 @@ const {
 
 module.exports = {
   // ?单入口文件打包
-  // entry: './src/index.js',
+  entry: './src/index.js',
+  // entry:'./terser/index.js',
   // ?多入口文件打包
-  entry: {
-    index: {
-      import: './src/index.js',
-      // filename选项
-      // filename:'js/[name].[contenthash:8].js',
-      dependOn: 'shared'
-    },
-    main: {
-      import: './src/main.js',
-      dependOn: 'shared'
-    },
-    shared: ['axios']
-  },
+  // entry: {
+  //   index: {
+  //     import: './src/index.js',
+  //     // filename选项
+  //     // filename:'js/[name].[contenthash:8].js',
+  //     dependOn: 'shared'
+  //   },
+  //   main: {
+  //     import: './src/main.js',
+  //     dependOn: 'shared'
+  //   },
+  //   shared: ['axios']
+  // },
   output: {
     path: path.join(__dirname, 'dist'),
     filename: 'js/[name].[contenthash:8].js',
@@ -145,18 +151,18 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash:10].css'
     }),
-    // ?压缩css文件
-    new OptimizeCssAssetsWebpackPlugin(),
+    // ?压缩css文件 用下面的取代
+    // new OptimizeCssAssetsWebpackPlugin(),
     new VueLoaderPlugin(),
     // ? shimming
     new ProvidePlugin({
       // key表示在项目中使用的名称
       // value表示要导入的第三方库名称
       // axios:'axios',
-      _:'lodash'
+      _: 'lodash'
     })
   ],
-  mode: 'production',
+  mode: 'development',
   resolve: {
     extensions: ['.mjs', '.js', '.json', '.css', '.vue'],
     alias: {
@@ -209,7 +215,32 @@ module.exports = {
       }
     },
     // todo 这里有一个chunksId表示，打包时的Id生成的一些数字的形式
-    chunkIds: 'natural'
+    chunkIds: 'natural',
+    // *还有一点，我们的代码有运行时文件，这样设置可以让运行时文件单独打包
+    runtimeChunk: {
+      name: 'runtime'
+    },
+    // *设置terserPlugin
+    minimize: true,
+    minimizer: [
+      // js压缩
+      new TerserPlugin({
+        // 对于一些运行时文件的注释不要提取为一个单独文件
+        extractComments: false,
+        // 处理js压缩使用电脑cpu核数-1线程来处理
+        parallel: true,
+        terserOptions: {
+          compress: {
+            arrows: true,
+            dead_code: true,
+            arguments: true
+          },
+          mangle: true
+        }
+      }),
+      // *css的压缩也是在这里，通过新的插件css-minimizer-webpack-plugin
+      new CssMinimizerPlugin()
+    ]
   },
   performance: {
     hints: false
