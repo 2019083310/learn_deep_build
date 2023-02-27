@@ -11,3 +11,5 @@ import './assets/css/测试cssTreeShaking.css'
 
 import {sub} from './demo/03_测试作用域提升'
 console.log(sub(2,1))
+
+import './demo/04_测试CSS-TreeShaking'

@@ -16,7 +16,9 @@ const {
 const CompressionPlugin = require('compression-webpack-plugin')
 
 // ?打包文件分析
-const { BundleAnalyzerPlugin }=require('webpack-bundle-analyzer')
+const {
+  BundleAnalyzerPlugin
+} = require('webpack-bundle-analyzer')
 
 module.exports = {
   mode: 'production',
@@ -30,12 +32,12 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'css/[name].[contenthash:10].css'
     }),
-    // new PurgeCSSPlugin({
-    // paths属性是必须的，没有会报错
-    //   paths: glob.sync(`${path.join(__dirname,'../src')}/**/*`, {
-    //     nodir: true
-    //   })
-    // }),
+    new PurgeCSSPlugin({
+      // paths属性是必须的，没有会报错
+      paths: glob.sync(`${path.join(__dirname,'../src')}/**/*`, {
+        nodir: true
+      })
+    }),
     // ?scope hoisting
     new webpack.optimize.ModuleConcatenationPlugin(),
     // ?gzip压缩

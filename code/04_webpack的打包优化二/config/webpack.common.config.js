@@ -27,7 +27,7 @@ const SpeedMeasurePlugin=require('speed-measure-webpack-plugin')
 const commonConfig = (isProduction) => {
   return {
     // ?单入口文件打包
-    entry: './src/index.js',
+    entry: './src/main.js',
     output: {
       path: path.join(__dirname, '../dist'),
       filename: 'js/[name].[contenthash:10].js',
