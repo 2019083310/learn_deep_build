@@ -1,4 +1,4 @@
-{
+module.exports={
   mode: 'development',
   context: 'D:\\前端\\深入学习前端打包工具\\code\\06_vue_webpack_configure',
   node: {
